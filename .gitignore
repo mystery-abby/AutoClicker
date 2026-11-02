@@ -1,0 +1,22 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 构建产物
+app/build/
+build/
+
+# 安装包与签名产物，不入库
+*.apk
+*.aab
+*.idsig
+*.jks
+*.keystore
+keystore.properties

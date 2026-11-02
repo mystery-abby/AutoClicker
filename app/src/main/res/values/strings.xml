@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">自动点击器</string>
+    <string name="accessibility_label">自动点击器</string>
+    <string name="accessibility_description">用于执行录制的点击 / 滑动脚本。本服务只在本机模拟手势，不会读取或上传任何内容。</string>
+
+    <string name="scripts">脚本</string>
+    <string name="schedules">定时任务</string>
+    <string name="new_script">新建脚本</string>
+    <string name="record">录制</string>
+    <string name="play">运行</string>
+    <string name="stop">停止</string>
+    <string name="delete">删除</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="undo">撤销</string>
+    <string name="finish_record">完成</string>
+
+    <string name="accessibility_off_title">无障碍服务未开启</string>
+    <string name="accessibility_off_desc">播放脚本需要开启无障碍服务，点击前往设置</string>
+    <string name="go_settings">去开启</string>
+    <string name="accessibility_on">无障碍服务已开启</string>
+    <string name="accessibility_not_ready">无障碍服务已开启但系统尚未就绪，请稍后重试；若持续失败请在系统中关闭后重新开启</string>
+    <string name="record_start_failed">无法启动录制：%1$s</string>
+    <string name="diagnose">诊断无障碍状态</string>
+    <string name="keepalive_channel_name">无障碍守护</string>
+    <string name="keepalive_channel_desc">保持进程存活，避免无障碍服务被系统回收</string>
+    <string name="keepalive_title">自动点击器正在守护无障碍服务</string>
+    <string name="keepalive_text">请勿关闭，否则无障碍可能被系统回收</string>
+    <string name="battery_title">建议关闭电池优化</string>
+    <string name="battery_desc">系统省电策略会杀掉本应用进程，导致无障碍被自动关闭</string>
+    <string name="battery_action">去设置</string>
+    <string name="battery_dialog_title">防止无障碍被系统关闭</string>
+    <string name="battery_dialog_message">国产系统（小米/华为/OPPO/vivo 等）会在后台清理本应用，导致无障碍服务被自动关闭。请按下面步骤设置：\n\n1. 点击下方「忽略电池优化」，选择「允许」\n2. 在应用详情页找到「自启动」并打开\n3. 找到「后台运行」/「后台活动」设为允许\n4. 在最近任务里锁定本应用（下拉卡片加锁）\n\n注意：Android 不允许应用自行重新开启无障碍，只能通过上述设置降低被关闭的概率。</string>
+    <string name="battery_ignore">忽略电池优化</string>
+    <string name="battery_app_details">应用详情页</string>
+    <string name="diagnose_copied">诊断信息已复制到剪贴板</string>
+
+    <string name="empty_scripts">还没有脚本，点击右下角新建或录制</string>
+    <string name="empty_actions">暂无动作，点击“录制”开始记录手势</string>
+    <string name="empty_schedules">暂无定时任务</string>
+    <string name="add_schedule">添加定时</string>
+    <string name="edit_schedule">编辑定时</string>
+    <string name="edit_schedule_title">编辑定时任务</string>
+
+    <string name="recording_hint">正在录制：直接操作屏幕，点击/长按/滑动都会被记录</string>
+    <string name="record_count">已记录 %1$d 个动作</string>
+    <string name="action_tap">点击</string>
+    <string name="action_long_press">长按</string>
+    <string name="action_swipe">滑动</string>
+    <string name="repeat_count">循环次数（0 表示无限）</string>
+    <string name="script_name">脚本名称</string>
+    <string name="delay_ms">间隔（毫秒）</string>
+    <string name="edit_delay">修改间隔</string>
+    <string name="no_permission_notification">请允许通知，否则无法显示运行状态</string>
+    <string name="playing">正在运行“%1$s”</string>
+    <string name="preparing_playback">正在准备运行脚本…</string>
+    <string name="playback_failed">无法运行脚本</string>
+    <string name="script_running">脚本正在运行，请先停止</string>
+
+    <string name="schedule_time">执行时间</string>
+    <string name="schedule_repeat">重复方式</string>
+    <string name="repeat_once">仅一次</string>
+    <string name="repeat_daily">每天</string>
+    <string name="repeat_weekdays">工作日</string>
+    <string name="schedule_weekdays">工作日 · %1$s</string>
+    <string name="repeat_interval">按间隔</string>
+    <string name="interval_minutes">间隔分钟数</string>
+    <string name="schedule_script">选择脚本</string>
+    <string name="schedule_enabled">启用</string>
+    <string name="exact_alarm_needed">需要“闹钟和提醒”权限才能准点执行，请前往授予</string>
+    <string name="schedule_saved">定时任务已保存</string>
+    <string name="script_saved">已保存</string>
+    <string name="notification_channel_name">脚本运行状态</string>
+    <string name="meta_script">%1$d 个动作 · %2$s</string>
+    <string name="meta_schedule_script">脚本：%1$s</string>
+    <string name="action_detail_tap">位置 (%1$d, %2$d)</string>
+    <string name="action_detail_swipe">(%1$d, %2$d) → (%3$d, %4$d)</string>
+    <string name="action_detail_swipe_path">%1$s · %2$d 个轨迹点</string>
+    <string name="delay_label">间隔 %1$d ms</string>
+    <string name="delay_dialog_title">设置动作间隔（毫秒）</string>
+    <string name="delete_confirm">确定删除“%1$s”？</string>
+    <string name="enable_accessibility_first">请先开启无障碍服务</string>
+    <string name="script_empty_cannot_play">脚本没有动作，请先录制</string>
+</resources>

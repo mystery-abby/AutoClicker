@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stopRoot"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/stopCircle"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_stop_float"
+        android:elevation="6dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/stop"
+            android:src="@drawable/ic_stop"
+            android:tint="#FFFFFF" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/progressText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="#B31B1D28"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="1dp"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp" />
+</LinearLayout>

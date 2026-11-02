@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#4F6BED</color>
+    <color name="primary_dark">#3A52C4</color>
+    <color name="secondary">#22B573</color>
+    <color name="bg">#F5F6FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#1B1D28</color>
+    <color name="text_secondary">#6B7080</color>
+    <color name="divider">#E6E8F0</color>
+    <color name="danger">#E5484D</color>
+    <color name="recorder_bar">#CC1B1D28</color>
+    <color name="launcher_bg">#4F6BED</color>
+</resources>
