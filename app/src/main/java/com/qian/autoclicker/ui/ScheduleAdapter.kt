@@ -16,6 +16,7 @@ class ScheduleAdapter(
     private val scriptName: (String) -> String,
     private val onToggle: (Schedule, Boolean) -> Unit,
     private val onEdit: (Schedule) -> Unit,
+    private val onHistory: (Schedule) -> Unit,
     private val onDelete: (Schedule) -> Unit
 ) : ListAdapter<Schedule, ScheduleAdapter.VH>(DIFF) {
 
@@ -49,12 +50,31 @@ class ScheduleAdapter(
         val nextText = if (schedule.enabled && next != null) {
             "下次 " + Format.dateTime(next)
         } else if (!schedule.enabled) "已停用" else "已过期"
-        b.metaText.text = ctx.getString(R.string.meta_schedule_script, name) + " · " + nextText
+        val meta = StringBuilder(ctx.getString(R.string.meta_schedule_script, name))
+            .append(" · ").append(nextText)
+        val randomMax = Schedule.effectiveRandomDelayMs(schedule)
+        if (randomMax > 0) {
+            meta.append(" · ").append(
+                ctx.getString(R.string.random_delay_summary, formatSpan(randomMax))
+            )
+        }
+        b.metaText.text = meta
 
         b.enabledSwitch.setOnCheckedChangeListener(null)
         b.enabledSwitch.isChecked = schedule.enabled
         b.enabledSwitch.setOnCheckedChangeListener { _, checked -> onToggle(schedule, checked) }
+        b.historyButton.setOnClickListener { onHistory(schedule) }
         b.editButton.setOnClickListener { onEdit(schedule) }
         b.deleteButton.setOnClickListener { onDelete(schedule) }
+    }
+
+    /** 600000 -> "10分钟"，90000 -> "1分30秒" */
+    private fun formatSpan(ms: Long): String {
+        val total = ms / 1000L
+        return when {
+            total % 60L == 0L -> "${total / 60}分钟"
+            total >= 60L -> "${total / 60}分${(total % 60).toString().padStart(2, '0')}秒"
+            else -> "${total}秒"
+        }
     }
 }

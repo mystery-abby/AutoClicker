@@ -141,6 +141,10 @@ class PlaybackService : Service() {
                 )
             },
             onFinished = {
+                // 正常走完：落一条成功记录（手动运行没有 pendingRecord，调用为空操作）
+                com.qian.autoclicker.schedule.AlarmReceiver.finishRecord(
+                    true, getString(R.string.exec_result_done)
+                )
                 stopPlaybackInternal()
             }
         )
@@ -151,6 +155,10 @@ class PlaybackService : Service() {
      * 用户看到的现象就是"点了运行毫无反应"。
      */
     private fun notifyErrorAndStop() {
+        // 定时触发的失败也要留下记录，否则用户只看到"没执行"却查不到原因
+        com.qian.autoclicker.schedule.AlarmReceiver.finishRecord(
+            false, getString(R.string.playback_failed)
+        )
         val nm = getSystemService(NotificationManager::class.java)
         runCatching {
             nm.notify(
@@ -162,6 +170,10 @@ class PlaybackService : Service() {
     }
 
     private fun stopPlaybackInternal() {
+        // 用户主动停止（通知栏 / 悬浮按钮）或异常收尾时，记录为"被停止"
+        com.qian.autoclicker.schedule.AlarmReceiver.finishRecord(
+            false, getString(R.string.exec_result_stopped)
+        )
         ClickAccessibilityService.instance?.stopPlayback()
         ScreenWake.releasePlaybackLock()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

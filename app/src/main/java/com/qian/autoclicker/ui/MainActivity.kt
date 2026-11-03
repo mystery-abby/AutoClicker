@@ -26,6 +26,7 @@ import com.qian.autoclicker.service.ClickAccessibilityService
 import com.qian.autoclicker.service.KeepAliveService
 import com.qian.autoclicker.service.PlaybackService
 import com.qian.autoclicker.util.AccessibilityUtils
+import com.qian.autoclicker.util.AppUi
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             scriptName = { id -> Repository.findScript(this, id)?.name ?: "(已删除)" },
             onToggle = ::toggleSchedule,
             onEdit = ::editSchedule,
+            onHistory = { schedule -> HistoryDialog.show(this, schedule) },
             onDelete = ::deleteSchedule
         )
 
@@ -96,6 +98,16 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         reload()
         syncKeepAlive()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        AppUi.attach(this)
+    }
+
+    override fun onStop() {
+        AppUi.detach(this)
+        super.onStop()
     }
 
     /** 无障碍开启时启用守护前台服务，降低被系统回收后"自动关闭"的概率 */
@@ -326,6 +338,7 @@ class MainActivity : AppCompatActivity() {
         val list = Repository.loadSchedules(this)
         list.removeAll { it.id == schedule.id }
         Repository.saveSchedules(this, list)
+        Repository.clearHistory(this, schedule.id)
         reload()
     }
 

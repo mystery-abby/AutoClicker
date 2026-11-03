@@ -13,6 +13,10 @@ object Repository {
     private const val PREFS = "autoclicker"
     private const val KEY_SCRIPTS = "scripts"
     private const val KEY_SCHEDULES = "schedules"
+    private const val KEY_HISTORY = "schedule_history"
+
+    /** 每个定时任务最多保留的执行记录条数 */
+    const val MAX_HISTORY = 10
 
     private val gson: Gson = GsonBuilder().serializeNulls().create()
 
@@ -57,10 +61,21 @@ object Repository {
 
     fun loadSchedules(ctx: Context): MutableList<Schedule> {
         val raw = prefs(ctx).getString(KEY_SCHEDULES, null) ?: return mutableListOf()
-        return runCatching {
+        val list = runCatching {
             val type = object : TypeToken<MutableList<Schedule>>() {}.type
             gson.fromJson<MutableList<Schedule>>(raw, type)
-        }.getOrNull() ?: mutableListOf()
+        }.getOrNull() ?: return mutableListOf()
+        // 旧数据没有 randomDelayMaxMs 字段，反序列化为 null；归一化为默认 15 分钟并写回，
+        // 避免每次读取都要到处判空。
+        var changed = false
+        list.forEach { schedule ->
+            if (schedule.randomDelayMaxMs == null) {
+                schedule.randomDelayMaxMs = Schedule.DEFAULT_RANDOM_DELAY_MS
+                changed = true
+            }
+        }
+        if (changed) saveSchedules(ctx, list)
+        return list
     }
 
     fun saveSchedules(ctx: Context, schedules: List<Schedule>) {
@@ -84,5 +99,37 @@ object Repository {
         val schedules = loadSchedules(ctx)
         schedules.removeAll { it.scriptId == id }
         saveSchedules(ctx, schedules)
+    }
+
+    // ---------- 定时任务执行记录 ----------
+
+    /** 结构：scheduleId -> 记录列表（按时间从旧到新） */
+    private fun loadHistoryMap(ctx: Context): MutableMap<String, MutableList<ExecRecord>> {
+        val raw = prefs(ctx).getString(KEY_HISTORY, null) ?: return mutableMapOf()
+        return runCatching {
+            val type = object : TypeToken<MutableMap<String, MutableList<ExecRecord>>>() {}.type
+            gson.fromJson<MutableMap<String, MutableList<ExecRecord>>>(raw, type)
+        }.getOrNull() ?: mutableMapOf()
+    }
+
+    /** 读取某任务的执行记录，最新的在前 */
+    fun loadHistory(ctx: Context, scheduleId: String): List<ExecRecord> =
+        loadHistoryMap(ctx)[scheduleId].orEmpty().asReversed().toList()
+
+    /** 追加一条执行记录；超过 [MAX_HISTORY] 条时丢弃最早的 */
+    fun appendHistory(ctx: Context, scheduleId: String, record: ExecRecord) {
+        val map = loadHistoryMap(ctx)
+        val list = map.getOrPut(scheduleId) { mutableListOf() }
+        list.add(record)
+        while (list.size > MAX_HISTORY) list.removeAt(0)
+        prefs(ctx).edit().putString(KEY_HISTORY, gson.toJson(map)).apply()
+    }
+
+    /** 删除某任务的记录（删除任务时调用） */
+    fun clearHistory(ctx: Context, scheduleId: String) {
+        val map = loadHistoryMap(ctx)
+        if (map.remove(scheduleId) != null) {
+            prefs(ctx).edit().putString(KEY_HISTORY, gson.toJson(map)).apply()
+        }
     }
 }

@@ -76,6 +76,12 @@ object ScheduleDialog {
                 (existing.intervalMs / 60_000L).coerceAtLeast(1L).toString()
             )
         }
+        // 随机延迟回填（拆分成分 + 秒）
+        val randomMax = if (existing == null) {
+            Schedule.DEFAULT_RANDOM_DELAY_MS
+        } else Schedule.effectiveRandomDelayMs(existing)
+        binding.randomMinuteInput.setText((randomMax / 60_000L).toString())
+        binding.randomSecondInput.setText(((randomMax % 60_000L) / 1000L).toString())
 
         binding.modeGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (!isChecked) return@addOnButtonCheckedListener
@@ -124,6 +130,13 @@ object ScheduleDialog {
                 val script = scripts[index]
                 val intervalMinutes = binding.intervalInput.text
                     ?.toString()?.toLongOrNull()?.coerceAtLeast(1L) ?: 30L
+                // 随机延迟：分钟 0..30，秒 0..59，总长不超过 30 分钟
+                val randMin = binding.randomMinuteInput.text
+                    ?.toString()?.toLongOrNull()?.coerceIn(0L, 30L) ?: 15L
+                val randSec = binding.randomSecondInput.text
+                    ?.toString()?.toLongOrNull()?.coerceIn(0L, 59L) ?: 0L
+                val randomMaxMs = (randMin * 60L + randSec) * 1000L
+                    .coerceIn(0L, Schedule.MAX_RANDOM_DELAY_MS)
 
                 val schedule = when (mode) {
                     RepeatMode.ONCE -> Schedule(
@@ -156,6 +169,7 @@ object ScheduleDialog {
                         intervalMs = intervalMinutes * 60_000L
                     )
                 }
+                schedule.randomDelayMaxMs = randomMaxMs
                 onSave(schedule)
             }
             .show()

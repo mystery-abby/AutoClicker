@@ -62,5 +62,41 @@ data class Schedule(
     /** ONCE/DAILY 用：一天中的毫秒偏移; INTERVAL 用：首次触发的 epoch 毫秒 */
     var triggerAt: Long = 0L,
     /** INTERVAL 模式的间隔，毫秒 */
-    var intervalMs: Long = 0L
+    var intervalMs: Long = 0L,
+    /**
+     * 到点后再随机等待的上限（毫秒），0 表示准点执行。
+     * 实际等待值在 [0, 该值] 内按时/分/秒随机抽取。
+     * 旧版本数据没有这个字段，Gson 反序列化后为 null，读取时归一化为默认 15 分钟。
+     */
+    var randomDelayMaxMs: Long? = DEFAULT_RANDOM_DELAY_MS
+) {
+    companion object {
+        /** 随机延迟默认 15 分钟 */
+        const val DEFAULT_RANDOM_DELAY_MS = 15 * 60_000L
+
+        /** 随机延迟上限 30 分钟 */
+        const val MAX_RANDOM_DELAY_MS = 30 * 60_000L
+
+        /** 取生效的随机延迟（null 视为默认值） */
+        fun effectiveRandomDelayMs(schedule: Schedule): Long =
+            (schedule.randomDelayMaxMs ?: DEFAULT_RANDOM_DELAY_MS)
+                .coerceIn(0L, MAX_RANDOM_DELAY_MS)
+    }
+}
+
+/**
+ * 一次定时任务的执行记录。
+ */
+data class ExecRecord(
+    /** 实际开始执行的时间点（含随机延迟后的真实时刻） */
+    val at: Long = 0L,
+    /** 计划触发时间点（闹钟原定时刻，不含随机延迟） */
+    val plannedAt: Long = 0L,
+    /** 本次随机等待的时长，毫秒 */
+    val randomDelayMs: Long = 0L,
+    /** 执行耗时，毫秒 */
+    val durationMs: Long = 0L,
+    val success: Boolean = false,
+    /** 结果说明：完成 / 被停止 / 无障碍未开启 等 */
+    val message: String = ""
 )

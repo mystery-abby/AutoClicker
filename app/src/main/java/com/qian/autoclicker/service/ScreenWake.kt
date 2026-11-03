@@ -21,17 +21,29 @@ object ScreenWake {
 
     fun wakeForSchedule(ctx: Context) {
         val app = ctx.applicationContext
-        runCatching {
-            app.startActivity(
-                Intent(app, WakeActivity::class.java).addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_NO_ANIMATION or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP
+        // 屏幕已经亮着且未锁屏时不要拉起 WakeActivity：
+        // 它会把本应用的任务重新拉到前台，反而让手势打在自己的界面上。
+        if (needsWake(app)) {
+            runCatching {
+                app.startActivity(
+                    Intent(app, WakeActivity::class.java).addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_NO_ANIMATION or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    )
                 )
-            )
-        }.onFailure { android.util.Log.w(TAG, "唤起亮屏页失败", it) }
+            }.onFailure { android.util.Log.w(TAG, "唤起亮屏页失败", it) }
+        }
 
         acquirePlaybackLock(app)
+    }
+
+    /** 屏幕熄灭或处于锁屏时才需要唤醒 */
+    private fun needsWake(ctx: Context): Boolean {
+        val pm = ctx.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
+        if (!pm.isInteractive) return true
+        val km = ctx.getSystemService(Context.KEYGUARD_SERVICE) as? android.app.KeyguardManager
+        return km?.isKeyguardLocked == true
     }
 
     /** 播放期间保持屏幕常亮，否则脚本跑到一半屏幕超时会熄屏 */

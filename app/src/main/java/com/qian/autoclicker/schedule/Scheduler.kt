@@ -20,14 +20,32 @@ object Scheduler {
     fun requestCodeFor(scheduleId: String): Int =
         scheduleId.hashCode() and 0x7FFFFFFF
 
-    private fun pendingIntent(ctx: Context, schedule: Schedule): PendingIntent {
+    private fun pendingIntent(
+        ctx: Context,
+        schedule: Schedule,
+        plannedAt: Long = 0L,
+        randomDelayMs: Long = 0L
+    ): PendingIntent {
         // requestCode 参与 PendingIntent 的等价判断，因此每个任务各不相同
         val intent = Intent(ctx, AlarmReceiver::class.java).apply {
             action = "${AlarmReceiver.ACTION_FIRE}.${schedule.id}"
             putExtra(AlarmReceiver.EXTRA_SCHEDULE_ID, schedule.id)
+            // 把"计划时刻"和"本次随机等待"带给接收器，用于写执行记录
+            putExtra(AlarmReceiver.EXTRA_PLANNED_AT, plannedAt)
+            putExtra(AlarmReceiver.EXTRA_RANDOM_MS, randomDelayMs)
         }
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         return PendingIntent.getBroadcast(ctx, requestCodeFor(schedule.id), intent, flags)
+    }
+
+    /**
+     * 在 [0, maxMs] 内按时/分/秒随机抽取等待时长。
+     * 精度到秒，因此先取整到秒再抽，避免出现毫秒级尾巴。
+     */
+    private fun randomDelayMs(maxMs: Long): Long {
+        val maxSeconds = (maxMs / 1000L)
+        if (maxSeconds <= 0L) return 0L
+        return java.util.concurrent.ThreadLocalRandom.current().nextLong(0L, maxSeconds + 1L) * 1000L
     }
 
     fun canScheduleExact(ctx: Context): Boolean {
@@ -95,21 +113,34 @@ object Scheduler {
 
     fun schedule(ctx: Context, schedule: Schedule) {
         val am = ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pi = pendingIntent(ctx, schedule)
-        am.cancel(pi)
+        // 先取消旧的（取消时不需要带上本次的额外参数，
+        // PendingIntent 的等价判断只看 action / requestCode）
+        am.cancel(pendingIntent(ctx, schedule))
         if (!schedule.enabled) return
 
-        val triggerAt = nextTriggerAt(schedule) ?: return
+        val plannedAt = nextTriggerAt(schedule) ?: return
+        // 到点后再随机等待一段时间才真正执行。随机值每次登记时重新抽取一次，
+        // 因此同一天多次触发（如按间隔）也会有不同的偏移。
+        val randomMs = randomDelayMs(Schedule.effectiveRandomDelayMs(schedule))
+        val fireAt = plannedAt + randomMs
+
+        val pi = pendingIntent(ctx, schedule, plannedAt, randomMs)
         try {
             if (canScheduleExact(ctx)) {
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, fireAt, pi)
             } else {
-                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, fireAt, pi)
             }
         } catch (_: SecurityException) {
-            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, fireAt, pi)
         }
     }
+
+    /**
+     * 展示用的"下次触发时间"：取计划时刻（不含随机延迟）。
+     * 随机值要到登记时才抽取，界面上不适合显示一个变动的数。
+     */
+    fun nextFireAtForDisplay(schedule: Schedule): Long? = nextTriggerAt(schedule)
 
     fun cancel(ctx: Context, schedule: Schedule) {
         val am = ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager

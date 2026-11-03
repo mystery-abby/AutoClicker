@@ -70,6 +70,24 @@
     <string name="schedule_enabled">启用</string>
     <string name="exact_alarm_needed">需要“闹钟和提醒”权限才能准点执行，请前往授予</string>
     <string name="schedule_saved">定时任务已保存</string>
+
+    <string name="random_delay">随机延迟</string>
+    <string name="random_delay_hint">到点后在 0 ~ 设定值内随机等待再执行，精度到秒</string>
+    <string name="random_delay_minutes">随机分钟数（0–30）</string>
+    <string name="random_delay_seconds">随机秒数</string>
+    <string name="random_delay_off">不随机</string>
+    <string name="random_delay_summary">到点后随机 %1$s</string>
+
+    <string name="history">执行记录</string>
+    <string name="history_title">执行记录（最近 10 条）</string>
+    <string name="history_empty">暂无执行记录</string>
+    <string name="history_planned">计划 %1$s</string>
+    <string name="history_delay">随机等待 %1$s</string>
+    <string name="history_duration">耗时 %1$s</string>
+    <string name="exec_result_done">执行完成</string>
+    <string name="exec_result_stopped">已停止</string>
+    <string name="exec_result_ok">成功</string>
+    <string name="exec_result_fail">失败</string>
     <string name="script_saved">已保存</string>
     <string name="notification_channel_name">脚本运行状态</string>
     <string name="meta_script">%1$d 个动作 · %2$s</string>

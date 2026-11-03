@@ -20,6 +20,7 @@ import com.qian.autoclicker.databinding.ActivityScriptEditorBinding
 import com.qian.autoclicker.service.ClickAccessibilityService
 import com.qian.autoclicker.service.PlaybackService
 import com.qian.autoclicker.util.AccessibilityUtils
+import com.qian.autoclicker.util.AppUi
 import kotlinx.coroutines.launch
 
 class ScriptEditorActivity : AppCompatActivity() {
@@ -65,6 +66,16 @@ class ScriptEditorActivity : AppCompatActivity() {
             script = it
             render()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        AppUi.attach(this)
+    }
+
+    override fun onStop() {
+        AppUi.detach(this)
+        super.onStop()
     }
 
     private fun render() {
