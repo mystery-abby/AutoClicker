@@ -84,6 +84,12 @@ class RecordOverlayView @JvmOverloads constructor(
                 Action.Type.SWIPE -> {
                     drawPolyline(canvas, action.effectivePath(), swipePaint)
                 }
+                Action.Type.GO_HOME -> {
+                    // 用绿点 + 「Home」标出回桌面动作
+                    canvas.drawCircle(action.x1.toFloat(), action.y1.toFloat(), 26f, swipeDotPaint)
+                    canvas.drawCircle(action.x1.toFloat(), action.y1.toFloat(), 26f, tapStroke)
+                    canvas.drawText("Home", action.x1.toFloat(), action.y1 + 10f, labelPaint)
+                }
             }
         }
 

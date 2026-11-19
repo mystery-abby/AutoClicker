@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.qian.autoclicker.ui.RecordOverlayView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/overlayView"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/canvasRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <com.qian.autoclicker.ui.RecordOverlayView
+        android:id="@+id/overlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

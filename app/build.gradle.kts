@@ -13,8 +13,8 @@ android {
         applicationId = "com.qian.autoclicker"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     // 从 keystore.properties 读取签名配置；文件缺失时 release 回退为 debug 签名

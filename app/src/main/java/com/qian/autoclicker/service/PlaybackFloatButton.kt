@@ -21,7 +21,7 @@ import kotlin.math.abs
  * 按钮本身可拖动到任意位置，点一下即停止播放。
  *
  * 注意：这个浮窗会拦截触摸，因此脚本执行到按钮所在区域时无法点击到下层 App。
- * 默认放在屏幕右侧中部偏下，用户如果发现挡住了目标区域可以拖走。
+ * 默认放在屏幕左上角，用户可拖动到任意位置；若挡住目标区域可拖走或长按临时隐藏。
  */
 class PlaybackFloatButton(
     private val service: AccessibilityService,
@@ -60,19 +60,22 @@ class PlaybackFloatButton(
                     x < 0 || y < 0
                 ) {
                     x = defaultX(dm.widthPixels, dm.density)
-                    y = defaultY(dm.heightPixels)
+                    y = defaultY(dm.heightPixels, dm.density)
                 }
             } else {
-                // 默认放在屏幕右侧边缘、偏下方，尽量避开常见操作区
+                // 默认放在屏幕左上角，尽量避开常见操作区
                 x = defaultX(dm.widthPixels, dm.density)
-                y = defaultY(dm.heightPixels)
+                y = defaultY(dm.heightPixels, dm.density)
             }
         }
-        binding.stopCircle.setOnClickListener {
+        // 点击、长按、拖动三个监听都挂在窗口根视图 binding.root 上，并让 stopCircle
+        // 保持不可点击：这样它不会消费触摸事件，父容器才能收到完整的 ACTION_MOVE 来完成
+        // 拖动；否则 clickable 的子 View 会吞掉事件，表现为“按钮只能点、不能拖”。
+        binding.root.setOnClickListener {
             onStop()
         }
         // 长按临时隐藏，避免按钮压住脚本要点击的位置
-        binding.stopCircle.setOnLongClickListener {
+        binding.root.setOnLongClickListener {
             temporarilyHide()
             true
         }
@@ -185,9 +188,10 @@ class PlaybackFloatButton(
     }
 
     private fun defaultX(screenWidth: Int, density: Float): Int =
-        (screenWidth - 72 * density).toInt().coerceAtLeast(0)
+        (16 * density).toInt().coerceAtLeast(0)
 
-    private fun defaultY(screenHeight: Int): Int = (screenHeight * 0.62f).toInt()
+    private fun defaultY(screenHeight: Int, density: Float): Int =
+        (24 * density).toInt().coerceAtLeast(0)
 
     private fun prefs() = service.applicationContext
         .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
@@ -209,7 +213,8 @@ class PlaybackFloatButton(
         private const val HIDE_DURATION_MS = 3_000L
 
         private const val PREFS = "autoclicker"
-        private const val KEY_X = "float_button_x"
-        private const val KEY_Y = "float_button_y"
+        // v2：默认位置改为左上角，旧版本保存的坐标不再沿用，强制落到新默认位
+        private const val KEY_X = "float_button_x_v2"
+        private const val KEY_Y = "float_button_y_v2"
     }
 }

@@ -25,7 +25,7 @@ data class Action(
      */
     val path: List<Pt> = emptyList()
 ) {
-    enum class Type { TAP, LONG_PRESS, SWIPE }
+    enum class Type { TAP, LONG_PRESS, SWIPE, GO_HOME }
 
     /** 取用于绘制/回放的轨迹：优先完整路径，老数据退化为起终点 */
     fun effectivePath(): List<Pt> = when {

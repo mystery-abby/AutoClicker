@@ -44,10 +44,13 @@
     <string name="edit_schedule_title">编辑定时任务</string>
 
     <string name="recording_hint">正在录制：直接操作屏幕，点击/长按/滑动都会被记录</string>
+    <string name="inject_busy">下层 App 未响应（手势队列繁忙），已放慢注入节奏</string>
+    <string name="inject_failed">下层 App 未响应：连续 %1$d 次注入失败</string>
     <string name="record_count">已记录 %1$d 个动作</string>
     <string name="action_tap">点击</string>
     <string name="action_long_press">长按</string>
     <string name="action_swipe">滑动</string>
+    <string name="action_home">回到主界面</string>
     <string name="repeat_count">循环次数（0 表示无限）</string>
     <string name="script_name">脚本名称</string>
     <string name="delay_ms">间隔（毫秒）</string>
@@ -57,6 +60,7 @@
     <string name="preparing_playback">正在准备运行脚本…</string>
     <string name="playback_failed">无法运行脚本</string>
     <string name="script_running">脚本正在运行，请先停止</string>
+    <string name="gesture_blocked_hint">系统未执行手势（连续 %1$d 次失败），已停止。当前界面可能禁止模拟操作：锁屏密码界面、银行/支付安全键盘、带安全标志的页面无法被自动点击，这是系统安全限制。</string>
 
     <string name="schedule_time">执行时间</string>
     <string name="schedule_repeat">重复方式</string>

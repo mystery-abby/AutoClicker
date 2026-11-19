@@ -35,6 +35,7 @@ class ActionAdapter(
             Action.Type.TAP -> ctx.getString(R.string.action_tap)
             Action.Type.LONG_PRESS -> ctx.getString(R.string.action_long_press)
             Action.Type.SWIPE -> ctx.getString(R.string.action_swipe)
+            Action.Type.GO_HOME -> ctx.getString(R.string.action_home)
         }
         b.detailText.text = when (action.type) {
             Action.Type.SWIPE -> {
